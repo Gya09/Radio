@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Radio Demo (Royalty-Free English Playlist)</title>
+  <style>
+    body { font-family: system-ui, Roboto, Arial; display:flex; align-items:center; justify-content:center;
+           min-height:100vh; margin:0; background:#0f172a; color:#e6eef8; }
+    .card { width: min(720px, 96%); padding:20px; border-radius:12px; background: linear-gradient(180deg,#0b1220,#111827);
+           box-shadow: 0 8px 30px rgba(2,6,23,0.6); }
+    h1 { margin:0 0 8px 0; font-size:20px; }
+    p { margin:0 0 18px 0; color:#9fb0d6; }
+    .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    button { padding:8px 12px; border-radius:8px; border:0; background:#1f2937; color:#e6eef8; cursor:pointer; }
+    button:active{ transform: translateY(1px); }
+    .track { margin-top:12px; font-weight:600; color:#dbeafe; }
+    input[type="range"]{ width:160px; }
+    .small { font-size:13px; color:#9fb0d6; margin-top:8px; }
+    a.link { color:#7dd3fc; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Radio Demo — Royalty-Free English Playlist</h1>
+    <p>Playlist terdiri dari lagu bebas hak cipta (sumber: Pixabay, Free Music Archive). Gunakan link ini untuk streaming atau embed di situs.</p>
+
+    <div class="controls">
+      <button id="prev">⟸ Prev</button>
+      <button id="play">▶ Play</button>
+      <button id="next">Next ⟹</button>
+
+      <label style="display:flex;align-items:center;gap:6px;margin-left:12px;">
+        Vol
+        <input id="vol" type="range" min="0" max="1" step="0.01" value="0.8">
+      </label>
+
+      <label style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+        Autoplay
+        <input id="autoplay" type="checkbox" checked>
+      </label>
+    </div>
+
+    <div class="track" id="track">—</div>
+    <div class="small">Jika ada lagu yang tidak bisa diputar di browser karena CORS atau server menolak akses, ganti dengan file mp3 lain yang diizinkan.</div>
+    <div style="margin-top:12px;font-size:13px">
+      Playlist source: <a class="link" href="#" id="m3ulink">Download .m3u</a> · Host sendiri untuk link permanen.
+    </div>
+  </div>
+
+  <audio id="audio" preload="auto"></audio>
+
+  <script>
+    // Playlist (gunakan link mp3 publik yang legal)
+    const playlist = [
+      {title:"Acoustic Breeze - Bensound", url:"https://cdn.pixabay.com/download/audio/2022/03/15/audio_ef4e8cce40.mp3?filename=acoustic-breeze-2059.mp3"},
+      {title:"Sunny Morning - FSM Team", url:"https://cdn.pixabay.com/download/audio/2022/10/24/audio_7c4f69f2a3.mp3?filename=sunny-morning-122345.mp3"},
+      {title:"Corporate Motivational - AShamaluevMusic", url:"https://cdn.pixabay.com/download/audio/2022/08/19/audio_c19a31b75c.mp3?filename=corporate-motivational-116198.mp3"},
+      {title:"Feel Good - Mixaund", url:"https://cdn.pixabay.com/download/audio/2021/09/02/audio_79b3b49796.mp3?filename=feel-good-6810.mp3"},
+      {title:"Ukulele Whistle - Scott Holmes", url:"https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/fhNdWrRbAG4HAn4F6G4iD6CdfUqPLXXtL0G2GyAg.mp3"},
+      {title:"The Lounge - Bensound", url:"https://cdn.pixabay.com/download/audio/2021/08/04/audio_3b51544bcb.mp3?filename=the-lounge-6285.mp3"},
+      {title:"Adventure - Bensound", url:"https://cdn.pixabay.com/download/audio/2022/02/23/audio_d14e9537f6.mp3?filename=adventure-2028.mp3"},
+      {title:"Beautiful Day - Mixaund", url:"https://cdn.pixabay.com/download/audio/2022/02/15/audio_5a57e2dcab.mp3?filename=beautiful-day-1997.mp3"},
+      {title:"Calm Music - Lesfm", url:"https://cdn.pixabay.com/download/audio/2022/06/02/audio_1e1b7a3a35.mp3?filename=calm-music-1106.mp3"},
+      {title:"Positive Vibes - Mixaund", url:"https://cdn.pixabay.com/download/audio/2022/02/15/audio_70e1b2a8b3.mp3?filename=positive-vibes-1995.mp3"}
+    ];
+
+    const audio = document.getElementById("audio");
+    const trackEl = document.getElementById("track");
+    const playBtn = document.getElementById("play");
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+    const vol = document.getElementById("vol");
+    const autoplay = document.getElementById("autoplay");
+    const m3ulink = document.getElementById("m3ulink");
+
+    let idx = 0;
+    let playing = false;
+
+    function loadTrack(i) {
+      if(i < 0) i = playlist.length - 1;
+      if(i >= playlist.length) i = 0;
+      idx = i;
+      audio.src = playlist[idx].url;
+      trackEl.textContent = (idx+1) + ". " + playlist[idx].title;
+    }
+
+    function playPause() {
+      if(audio.paused) {
+        audio.play().catch(e => console.warn("Autoplay blocked or CORS issue:", e));
+      } else {
+        audio.pause();
+      }
+    }
+
+    playBtn.addEventListener("click", ()=> {
+      playPause();
+    });
+
+    prevBtn.addEventListener("click", ()=> {
+      loadTrack(idx-1);
+      if(autoplay.checked) audio.play();
+    });
+
+    nextBtn.addEventListener("click", ()=> {
+      loadTrack(idx+1);
+      if(autoplay.checked) audio.play();
+    });
+
+    audio.addEventListener("play", ()=> playBtn.textContent = "⏸ Pause");
+    audio.addEventListener("pause", ()=> playBtn.textContent = "▶ Play");
+    audio.addEventListener("ended", ()=> {
+      loadTrack(idx+1);
+      if(autoplay.checked) audio.play();
+    });
+
+    vol.addEventListener("input", ()=> audio.volume = vol.value);
+
+    // Build .m3u data URL for user to download if desired
+    (function buildM3U() {
+      let m3u = "#EXTM3U\\n";
+      playlist.forEach(p=>{
+        m3u += "#EXTINF:-1," + p.title + "\\n" + p.url + "\\n";
+      });
+      // create blob link
+      const blob = new Blob([m3u], {type: "audio/x-mpegurl"});
+      const url = URL.createObjectURL(blob);
+      m3ulink.href = url;
+      m3ulink.download = "radio_playlist.m3u";
+      m3ulink.addEventListener("click", ()=> setTimeout(()=> URL.revokeObjectURL(url), 1000));
+    })();
+
+    // init
+    loadTrack(0);
+    audio.volume = vol.value;
+    if(autoplay.checked) {
+      // attempt autoplay; may be blocked by some browsers
+      audio.play().catch(()=>{/* ignore autoplay block */});
+    }
+  </script>
+</body>
+</html>
