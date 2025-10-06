@@ -1,142 +1,257 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Radio Demo (Royalty-Free English Playlist)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gya Radio Live v3</title>
   <style>
-    body { font-family: system-ui, Roboto, Arial; display:flex; align-items:center; justify-content:center;
-           min-height:100vh; margin:0; background:#0f172a; color:#e6eef8; }
-    .card { width: min(720px, 96%); padding:20px; border-radius:12px; background: linear-gradient(180deg,#0b1220,#111827);
-           box-shadow: 0 8px 30px rgba(2,6,23,0.6); }
-    h1 { margin:0 0 8px 0; font-size:20px; }
-    p { margin:0 0 18px 0; color:#9fb0d6; }
-    .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    button { padding:8px 12px; border-radius:8px; border:0; background:#1f2937; color:#e6eef8; cursor:pointer; }
-    button:active{ transform: translateY(1px); }
-    .track { margin-top:12px; font-weight:600; color:#dbeafe; }
-    input[type="range"]{ width:160px; }
-    .small { font-size:13px; color:#9fb0d6; margin-top:8px; }
-    a.link { color:#7dd3fc; text-decoration:none; }
+    :root {
+      --bg: radial-gradient(circle at top, #0a0a0a, #181818);
+      --text: #ffffff;
+      --button: #1db954;
+      --button-hover: #17a34a;
+      --shadow: rgba(29, 185, 84, 0.3);
+    }
+
+    body.light {
+      --bg: radial-gradient(circle at top, #f3f3f3, #d9d9d9);
+      --text: #111;
+      --button: #007bff;
+      --button-hover: #0063cc;
+      --shadow: rgba(0, 123, 255, 0.3);
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      overflow: hidden;
+      transition: background 1s, color 0.5s;
+    }
+
+    .player {
+      background: rgba(20, 20, 20, 0.85);
+      padding: 25px;
+      border-radius: 25px;
+      box-shadow: 0 0 40px var(--shadow);
+      max-width: 360px;
+      transition: all 0.5s;
+    }
+
+    body.light .player {
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    img {
+      width: 100%;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      transition: 0.5s;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 10px 0 15px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    h2 span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 12s linear infinite;
+    }
+
+    @keyframes marquee {
+      from { transform: translate(0, 0); }
+      to { transform: translate(-100%, 0); }
+    }
+
+    .now-playing {
+      font-size: 14px;
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+
+    .equalizer {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 3px;
+    }
+
+    .bar {
+      width: 4px;
+      height: 15px;
+      background: var(--button);
+      border-radius: 2px;
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+    .bar:nth-child(4) { animation-delay: 0.6s; }
+    .bar:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes bounce {
+      0%, 100% { transform: scaleY(0.3); }
+      50% { transform: scaleY(1); }
+    }
+
+    button {
+      background: var(--button);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      margin: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+    }
+
+    #themeToggle {
+      margin-top: 8px;
+      background: none;
+      color: var(--text);
+      border: 1px solid var(--text);
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+      margin-top: 8px;
+    }
+
+    #clock {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 12px;
+      color: #555;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Radio Demo — Royalty-Free English Playlist</h1>
-    <p>Playlist terdiri dari lagu bebas hak cipta (sumber: Pixabay, Free Music Archive). Gunakan link ini untuk streaming atau embed di situs.</p>
-
-    <div class="controls">
-      <button id="prev">⟸ Prev</button>
-      <button id="play">▶ Play</button>
-      <button id="next">Next ⟹</button>
-
-      <label style="display:flex;align-items:center;gap:6px;margin-left:12px;">
-        Vol
-        <input id="vol" type="range" min="0" max="1" step="0.01" value="0.8">
-      </label>
-
-      <label style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-        Autoplay
-        <input id="autoplay" type="checkbox" checked>
-      </label>
+  <div class="player" id="playerBox">
+    <img id="cover" src="" alt="Cover Art">
+    <h2 id="title"><span>Loading...</span></h2>
+    <div class="now-playing">Now Playing 
+      <div class="equalizer">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </div>
     </div>
-
-    <div class="track" id="track">—</div>
-    <div class="small">Jika ada lagu yang tidak bisa diputar di browser karena CORS atau server menolak akses, ganti dengan file mp3 lain yang diizinkan.</div>
-    <div style="margin-top:12px;font-size:13px">
-      Playlist source: <a class="link" href="#" id="m3ulink">Download .m3u</a> · Host sendiri untuk link permanen.
+    <audio id="audio" controls autoplay></audio>
+    <div>
+      <button onclick="prevSong()">⏮ Prev</button>
+      <button onclick="nextSong()">⏭ Next</button>
     </div>
+    <button id="themeToggle">🌙 Toggle Theme</button>
+    <div id="clock"></div>
   </div>
 
-  <audio id="audio" preload="auto"></audio>
+  <footer>© 2025 Gya Radio • Royalty-Free Playlist</footer>
 
   <script>
-    // Playlist (gunakan link mp3 publik yang legal)
-    const playlist = [
-      {title:"Acoustic Breeze - Bensound", url:"https://cdn.pixabay.com/download/audio/2022/03/15/audio_ef4e8cce40.mp3?filename=acoustic-breeze-2059.mp3"},
-      {title:"Sunny Morning - FSM Team", url:"https://cdn.pixabay.com/download/audio/2022/10/24/audio_7c4f69f2a3.mp3?filename=sunny-morning-122345.mp3"},
-      {title:"Corporate Motivational - AShamaluevMusic", url:"https://cdn.pixabay.com/download/audio/2022/08/19/audio_c19a31b75c.mp3?filename=corporate-motivational-116198.mp3"},
-      {title:"Feel Good - Mixaund", url:"https://cdn.pixabay.com/download/audio/2021/09/02/audio_79b3b49796.mp3?filename=feel-good-6810.mp3"},
-      {title:"Ukulele Whistle - Scott Holmes", url:"https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/fhNdWrRbAG4HAn4F6G4iD6CdfUqPLXXtL0G2GyAg.mp3"},
-      {title:"The Lounge - Bensound", url:"https://cdn.pixabay.com/download/audio/2021/08/04/audio_3b51544bcb.mp3?filename=the-lounge-6285.mp3"},
-      {title:"Adventure - Bensound", url:"https://cdn.pixabay.com/download/audio/2022/02/23/audio_d14e9537f6.mp3?filename=adventure-2028.mp3"},
-      {title:"Beautiful Day - Mixaund", url:"https://cdn.pixabay.com/download/audio/2022/02/15/audio_5a57e2dcab.mp3?filename=beautiful-day-1997.mp3"},
-      {title:"Calm Music - Lesfm", url:"https://cdn.pixabay.com/download/audio/2022/06/02/audio_1e1b7a3a35.mp3?filename=calm-music-1106.mp3"},
-      {title:"Positive Vibes - Mixaund", url:"https://cdn.pixabay.com/download/audio/2022/02/15/audio_70e1b2a8b3.mp3?filename=positive-vibes-1995.mp3"}
+    const songs = [
+      {
+        title: "Dreams of Summer – Komiku",
+        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/It's_time_for_adventure/Komiku_-_03_-_Dreams_of_Summer.mp3",
+        cover: "https://i.imgur.com/0QZclKF.jpg"
+      },
+      {
+        title: "Night Drive – Artificial.Music",
+        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Music_for_Video/Artificial_Music/Awake/Artificial_Music_-_Night_Drive.mp3",
+        cover: "https://i.imgur.com/yrgqIvK.jpg"
+      },
+      {
+        title: "In Love With You – A Himitsu",
+        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/A_Himitsu/Adventure/A_Himitsu_-_In_Love_With_You.mp3",
+        cover: "https://i.imgur.com/0UpYvXh.jpg"
+      },
+      {
+        title: "Fresh Air – Scandinavianz",
+        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Scandinavianz/Fresh_Air/Scandinavianz_-_Fresh_Air.mp3",
+        cover: "https://i.imgur.com/zEfdO3O.jpg"
+      }
     ];
 
+    let currentIndex = 0;
     const audio = document.getElementById("audio");
-    const trackEl = document.getElementById("track");
-    const playBtn = document.getElementById("play");
-    const prevBtn = document.getElementById("prev");
-    const nextBtn = document.getElementById("next");
-    const vol = document.getElementById("vol");
-    const autoplay = document.getElementById("autoplay");
-    const m3ulink = document.getElementById("m3ulink");
+    const title = document.getElementById("title");
+    const cover = document.getElementById("cover");
+    const playerBox = document.getElementById("playerBox");
+    const themeToggle = document.getElementById("themeToggle");
 
-    let idx = 0;
-    let playing = false;
-
-    function loadTrack(i) {
-      if(i < 0) i = playlist.length - 1;
-      if(i >= playlist.length) i = 0;
-      idx = i;
-      audio.src = playlist[idx].url;
-      trackEl.textContent = (idx+1) + ". " + playlist[idx].title;
+    // Load song
+    function loadSong(index) {
+      const song = songs[index];
+      title.innerHTML = `<span>${song.title}</span>`;
+      cover.src = song.cover;
+      audio.src = song.src;
+      document.title = `🎧 ${song.title} | Gya Radio`;
+      playerBox.style.boxShadow = `0 0 30px var(--shadow)`;
+      audio.play();
     }
 
-    function playPause() {
-      if(audio.paused) {
-        audio.play().catch(e => console.warn("Autoplay blocked or CORS issue:", e));
+    // Next / Prev
+    function nextSong() {
+      currentIndex = (currentIndex + 1) % songs.length;
+      loadSong(currentIndex);
+    }
+    function prevSong() {
+      currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+      loadSong(currentIndex);
+    }
+    audio.addEventListener("ended", nextSong);
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      document.getElementById("clock").textContent = "🕒 " + time;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Theme control
+    function applyAutoTheme() {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 18) {
+        document.body.classList.add("light");
       } else {
-        audio.pause();
+        document.body.classList.remove("light");
       }
     }
 
-    playBtn.addEventListener("click", ()=> {
-      playPause();
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("light");
     });
 
-    prevBtn.addEventListener("click", ()=> {
-      loadTrack(idx-1);
-      if(autoplay.checked) audio.play();
-    });
-
-    nextBtn.addEventListener("click", ()=> {
-      loadTrack(idx+1);
-      if(autoplay.checked) audio.play();
-    });
-
-    audio.addEventListener("play", ()=> playBtn.textContent = "⏸ Pause");
-    audio.addEventListener("pause", ()=> playBtn.textContent = "▶ Play");
-    audio.addEventListener("ended", ()=> {
-      loadTrack(idx+1);
-      if(autoplay.checked) audio.play();
-    });
-
-    vol.addEventListener("input", ()=> audio.volume = vol.value);
-
-    // Build .m3u data URL for user to download if desired
-    (function buildM3U() {
-      let m3u = "#EXTM3U\\n";
-      playlist.forEach(p=>{
-        m3u += "#EXTINF:-1," + p.title + "\\n" + p.url + "\\n";
-      });
-      // create blob link
-      const blob = new Blob([m3u], {type: "audio/x-mpegurl"});
-      const url = URL.createObjectURL(blob);
-      m3ulink.href = url;
-      m3ulink.download = "radio_playlist.m3u";
-      m3ulink.addEventListener("click", ()=> setTimeout(()=> URL.revokeObjectURL(url), 1000));
-    })();
-
-    // init
-    loadTrack(0);
-    audio.volume = vol.value;
-    if(autoplay.checked) {
-      // attempt autoplay; may be blocked by some browsers
-      audio.play().catch(()=>{/* ignore autoplay block */});
-    }
+    window.onload = () => {
+      applyAutoTheme();
+      loadSong(currentIndex);
+      audio.volume = 0.8;
+    };
   </script>
 </body>
 </html>
