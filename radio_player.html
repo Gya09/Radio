@@ -3,28 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gya Radio Live v3</title>
+  <title>Gya09 Radio Player</title>
   <style>
-    :root {
-      --bg: radial-gradient(circle at top, #0a0a0a, #181818);
-      --text: #ffffff;
-      --button: #1db954;
-      --button-hover: #17a34a;
-      --shadow: rgba(29, 185, 84, 0.3);
-    }
-
-    body.light {
-      --bg: radial-gradient(circle at top, #f3f3f3, #d9d9d9);
-      --text: #111;
-      --button: #007bff;
-      --button-hover: #0063cc;
-      --shadow: rgba(0, 123, 255, 0.3);
-    }
-
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #0d0d0d, #1c1c1c);
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -32,85 +16,54 @@
       height: 100vh;
       margin: 0;
       text-align: center;
-      overflow: hidden;
-      transition: background 1s, color 0.5s;
     }
 
     .player {
-      background: rgba(20, 20, 20, 0.85);
+      background: #181818;
       padding: 25px;
-      border-radius: 25px;
-      box-shadow: 0 0 40px var(--shadow);
-      max-width: 360px;
-      transition: all 0.5s;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+      max-width: 350px;
+      animation: fadeIn 1s ease-in-out;
     }
 
-    body.light .player {
-      background: rgba(255, 255, 255, 0.85);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     img {
       width: 100%;
       border-radius: 15px;
       margin-bottom: 15px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-      transition: 0.5s;
+      animation: spin 10s linear infinite;
+      animation-play-state: paused;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     h2 {
-      font-size: 18px;
-      margin: 10px 0 15px;
-      overflow: hidden;
+      font-size: 16px;
+      margin: 10px 0 15px 0;
       white-space: nowrap;
-    }
-
-    h2 span {
-      display: inline-block;
-      padding-left: 100%;
-      animation: marquee 12s linear infinite;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      animation: marquee 8s linear infinite;
     }
 
     @keyframes marquee {
-      from { transform: translate(0, 0); }
-      to { transform: translate(-100%, 0); }
-    }
-
-    .now-playing {
-      font-size: 14px;
-      margin-top: 5px;
-      opacity: 0.8;
-    }
-
-    .equalizer {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-      gap: 3px;
-    }
-
-    .bar {
-      width: 4px;
-      height: 15px;
-      background: var(--button);
-      border-radius: 2px;
-      animation: bounce 1s infinite ease-in-out;
-    }
-
-    .bar:nth-child(2) { animation-delay: 0.2s; }
-    .bar:nth-child(3) { animation-delay: 0.4s; }
-    .bar:nth-child(4) { animation-delay: 0.6s; }
-    .bar:nth-child(5) { animation-delay: 0.8s; }
-
-    @keyframes bounce {
-      0%, 100% { transform: scaleY(0.3); }
-      50% { transform: scaleY(1); }
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
 
     button {
-      background: var(--button);
+      background: #1db954;
       color: white;
       border: none;
-      padding: 10px 18px;
+      padding: 10px 20px;
       border-radius: 25px;
       margin: 5px;
       cursor: pointer;
@@ -119,79 +72,43 @@
     }
 
     button:hover {
-      background: var(--button-hover);
-    }
-
-    #themeToggle {
-      margin-top: 8px;
-      background: none;
-      color: var(--text);
-      border: 1px solid var(--text);
-      padding: 6px 12px;
-      font-size: 13px;
-    }
-
-    audio {
-      width: 100%;
-      outline: none;
-      margin-top: 8px;
-    }
-
-    #clock {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #ccc;
-    }
-
-    footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 12px;
-      color: #555;
+      background: #17a34a;
     }
   </style>
 </head>
 <body>
-  <div class="player" id="playerBox">
-    <img id="cover" src="" alt="Cover Art">
-    <h2 id="title"><span>Loading...</span></h2>
-    <div class="now-playing">Now Playing 
-      <div class="equalizer">
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-      </div>
-    </div>
-    <audio id="audio" controls autoplay></audio>
+  <div class="player">
+    <img id="cover" src="https://i.imgur.com/zEfdO3O.jpg" alt="Cover Art">
+    <h2 id="title">Click Start to Play</h2>
+    <audio id="audio"></audio>
     <div>
+      <button id="startBtn" onclick="startRadio()">▶ Start Radio</button>
       <button onclick="prevSong()">⏮ Prev</button>
       <button onclick="nextSong()">⏭ Next</button>
     </div>
-    <button id="themeToggle">🌙 Toggle Theme</button>
-    <div id="clock"></div>
   </div>
-
-  <footer>© 2025 Gya Radio • Royalty-Free Playlist</footer>
 
   <script>
     const songs = [
       {
         title: "Dreams of Summer – Komiku",
-        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/It's_time_for_adventure/Komiku_-_03_-_Dreams_of_Summer.mp3",
+        src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_f9ff1f7ec8.mp3?filename=dreams-of-summer-11449.mp3",
         cover: "https://i.imgur.com/0QZclKF.jpg"
       },
       {
-        title: "Night Drive – Artificial.Music",
-        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Music_for_Video/Artificial_Music/Awake/Artificial_Music_-_Night_Drive.mp3",
-        cover: "https://i.imgur.com/yrgqIvK.jpg"
-      },
-      {
-        title: "In Love With You – A Himitsu",
-        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/A_Himitsu/Adventure/A_Himitsu_-_In_Love_With_You.mp3",
+        title: "Journey – A Himitsu",
+        src: "https://cdn.pixabay.com/download/audio/2023/02/02/audio_d23c0a207b.mp3?filename=journey-138397.mp3",
         cover: "https://i.imgur.com/0UpYvXh.jpg"
       },
       {
-        title: "Fresh Air – Scandinavianz",
-        src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Scandinavianz/Fresh_Air/Scandinavianz_-_Fresh_Air.mp3",
+        title: "Sunny Days – Scandinavianz",
+        src: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_43821cc8e1.mp3?filename=sunny-days-110997.mp3",
         cover: "https://i.imgur.com/zEfdO3O.jpg"
+      },
+      {
+        title: "Chill Vibes – Luke Bergs",
+        src: "https://cdn.pixabay.com/download/audio/2023/06/01/audio_57343c4e48.mp3?filename=chill-vibes-146466.mp3",
+        cover: "https://i.imgur.com/yrgqIvK.jpg"
       }
     ];
 
@@ -199,59 +116,38 @@
     const audio = document.getElementById("audio");
     const title = document.getElementById("title");
     const cover = document.getElementById("cover");
-    const playerBox = document.getElementById("playerBox");
-    const themeToggle = document.getElementById("themeToggle");
+    const startBtn = document.getElementById("startBtn");
 
-    // Load song
     function loadSong(index) {
       const song = songs[index];
-      title.innerHTML = `<span>${song.title}</span>`;
+      title.textContent = song.title;
       cover.src = song.cover;
       audio.src = song.src;
-      document.title = `🎧 ${song.title} | Gya Radio`;
-      playerBox.style.boxShadow = `0 0 30px var(--shadow)`;
-      audio.play();
     }
 
-    // Next / Prev
+    function startRadio() {
+      startBtn.style.display = "none";
+      audio.play();
+      cover.style.animationPlayState = "running";
+    }
+
     function nextSong() {
       currentIndex = (currentIndex + 1) % songs.length;
       loadSong(currentIndex);
+      audio.play();
     }
+
     function prevSong() {
       currentIndex = (currentIndex - 1 + songs.length) % songs.length;
       loadSong(currentIndex);
+      audio.play();
     }
+
     audio.addEventListener("ended", nextSong);
+    audio.addEventListener("play", () => cover.style.animationPlayState = "running");
+    audio.addEventListener("pause", () => cover.style.animationPlayState = "paused");
 
-    // Clock
-    function updateClock() {
-      const now = new Date();
-      const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-      document.getElementById("clock").textContent = "🕒 " + time;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Theme control
-    function applyAutoTheme() {
-      const hour = new Date().getHours();
-      if (hour >= 6 && hour < 18) {
-        document.body.classList.add("light");
-      } else {
-        document.body.classList.remove("light");
-      }
-    }
-
-    themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("light");
-    });
-
-    window.onload = () => {
-      applyAutoTheme();
-      loadSong(currentIndex);
-      audio.volume = 0.8;
-    };
+    loadSong(currentIndex);
   </script>
 </body>
 </html>
