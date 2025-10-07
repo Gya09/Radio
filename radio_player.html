@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Spotify Style Music Player</title>
+<title>Spotify Style Player</title>
 <style>
   body {
     background-color: #121212;
@@ -23,9 +23,18 @@
     text-align: center;
   }
 
+  .song-info {
+    margin-bottom: 10px;
+  }
+
   .song-title {
     font-weight: bold;
-    margin-bottom: 15px;
+    font-size: 18px;
+  }
+
+  .song-artist {
+    font-size: 14px;
+    color: #b3b3b3;
   }
 
   .controls {
@@ -81,8 +90,12 @@
 <body>
 
 <div class="player">
-  <div class="song-title" id="song-title">Joji - Glimpse of Us</div>
-  <audio id="audio" src="Joji.-.Glimpse.of.Us.Lyrics.mp3"></audio>
+  <div class="song-info">
+    <div class="song-title" id="song-title">Loading...</div>
+    <div class="song-artist" id="song-artist"></div>
+  </div>
+
+  <audio id="audio"></audio>
 
   <div class="progress-container" id="progress-container">
     <div class="progress" id="progress"></div>
@@ -103,16 +116,27 @@
 
 <script>
   const songs = [
-    "MileyCyrus.-.Angels.Like.You.Lyrics.mp3",
-    "Adele.-.Easy.On.Me.Official.Lyric.Video.mp3",
-    "Joji.-.Glimpse.of.Us.Lyrics.mp3",
-    "The.Weeknd.-.DIE.FOR.YOU.Lyrics.mp3"
+    {title: "Angels Like You", artist: "Miley Cyrus", file: "https://github.com/Gya09/Radio/releases/download/v1.0/MileyCyrus.-.Angels.Like.You.Lyrics.mp3"},
+    {title: "Easy On Me", artist: "Adele", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Adele.-.Easy.On.Me.Official.Lyric.Video.mp3"},
+    {title: "Forever Young", artist: "Alphaville", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Alphaville.-.Forever.Young.Video.Lyrics.mp3"},
+    {title: "505", artist: "Arctic Monkeys", file: "https://github.com/Gya09/Radio/releases/download/v1.0/arctic.monkeys.__.505.lyrics.mp3"},
+    {title: "Beautiful Things", artist: "Benson Boone", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Benson.Boone.-.Beautiful.Things.Official.Music.Video.mp3"},
+    {title: "When I Was Your Man", artist: "Bruno Mars", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Bruno.Mars.-.When.I.Was.Your.Man.mp3"},
+    {title: "Can I Be Him", artist: "James Arthur", file: "https://github.com/Gya09/Radio/releases/download/v1.0/can.i.be.him.-.james.arthur.speed.up.with.lyrics.mp3"},
+    {title: "I Can Tell", artist: "Giveon", file: "https://github.com/Gya09/Radio/releases/download/v1.0/GIVEON.-.I.CAN.TELL.mp3"},
+    {title: "Drunk Text", artist: "Henry Moodie", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Henry.Moodie.-.drunk.text.Lyrics.mp3"},
+    {title: "Glimpse of Us", artist: "Joji", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Joji.-.Glimpse.of.Us.Lyrics.mp3"},
+    {title: "Somewhere Only We Know", artist: "Keane", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Keane.-.Somewhere.Only.We.Know.Lyrics.mp3"},
+    {title: "Die With A Smile", artist: "Lady Gaga & Bruno Mars", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Lady.Gaga.Bruno.Mars.-.Die.With.A.Smile.Lyrics.mp3"},
+    {title: "We Hug Now", artist: "Sydney Rose", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Sydney.Rose.-.We.Hug.Now.Lyrics.mp3"},
+    {title: "Die For You", artist: "The Weeknd", file: "https://github.com/Gya09/Radio/releases/download/v1.0/The.Weeknd.-.DIE.FOR.YOU.Lyrics.mp3"}
   ];
 
-  let currentSong = 2; // mulai dari Joji
+  let currentSong = 0;
   const audio = document.getElementById("audio");
   const playBtn = document.getElementById("play");
   const title = document.getElementById("song-title");
+  const artist = document.getElementById("song-artist");
   const progressContainer = document.getElementById("progress-container");
   const progress = document.getElementById("progress");
   const currentTimeEl = document.getElementById("current-time");
@@ -120,8 +144,9 @@
   const volumeSlider = document.getElementById("volume");
 
   function loadSong(song) {
-    audio.src = song;
-    title.textContent = song.replaceAll('.', ' ');
+    title.textContent = song.title;
+    artist.textContent = song.artist;
+    audio.src = song.file;
   }
 
   function playSong() {
@@ -135,8 +160,11 @@
   }
 
   playBtn.addEventListener("click", () => {
-    const isPlaying = !audio.paused;
-    isPlaying ? pauseSong() : playSong();
+    if (audio.paused) {
+      playSong();
+    } else {
+      pauseSong();
+    }
   });
 
   document.getElementById("next").addEventListener("click", () => {
@@ -162,4 +190,30 @@
     const progressPercent = (currentTime / duration) * 100;
     progress.style.width = `${progressPercent}%`;
 
-    let minut
+    // waktu sekarang
+    let minutes = Math.floor(currentTime / 60);
+    let seconds = Math.floor(currentTime % 60);
+    if (seconds < 10) seconds = `0${seconds}`;
+    currentTimeEl.textContent = `${minutes}:${seconds}`;
+
+    // total durasi
+    if (duration) {
+      let durMin = Math.floor(duration / 60);
+      let durSec = Math.floor(duration % 60);
+      if (durSec < 10) durSec = `0${durSec}`;
+      durationEl.textContent = `${durMin}:${durSec}`;
+    }
+  }
+
+  function setProgress(e) {
+    const width = this.clientWidth;
+    const clickX = e.offsetX;
+    const duration = audio.duration;
+    audio.currentTime = (clickX / width) * duration;
+  }
+
+  loadSong(songs[currentSong]);
+</script>
+
+</body>
+</html>
