@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>JGRP Boombox MP3 Playlist</title>
+</head>
+<body>
+<audio id="radio" autoplay></audio>
+
+<script>
+const songs = [
+  "https://github.com/Gya09/Radio/releases/download/v1.0/MileyCyrus.-.Angels.Like.You.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Adele.-.Easy.On.Me.Official.Lyric.Video.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Alphaville.-.Forever.Young.Video.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/arctic.monkeys.__.505.lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Benson.Boone.-.Beautiful.Things.Official.Music.Video.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Bruno.Mars.-.When.I.Was.Your.Man.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/can.i.be.him.-.james.arthur.speed.up.with.lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/GIVEON.-.I.CAN.TELL.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Henry.Moodie.-.drunk.text.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Joji.-.Glimpse.of.Us.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Keane.-.Somewhere.Only.We.Know.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Lady.Gaga.Bruno.Mars.-.Die.With.A.Smile.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/Sydney.Rose.-.We.Hug.Now.Lyrics.mp3",
+  "https://github.com/Gya09/Radio/releases/download/v1.0/The.Weeknd.-.DIE.FOR.YOU.Lyrics.mp3"
+];
+
+let currentSong = Math.floor(Math.random() * songs.length);
+const radio = document.getElementById("radio");
+
+function playNext(){
+  currentSong = Math.floor(Math.random() * songs.length);
+  radio.src = songs[currentSong];
+  radio.play();
+}
+
+// mulai lagu pertama
+radio.src = songs[currentSong];
+radio.play();
+
+// shuffle tiap lagu selesai
+radio.addEventListener("ended", playNext);
+</script>
+</body>
+</html>
