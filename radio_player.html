@@ -1,148 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gya09 Radio</title>
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #0d0d0d, #1c1c1c);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gya09 Spotify Radio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #121212, #1e1e1e);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-    .player {
-      background: #181818;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
-      max-width: 350px;
-    }
+  .player {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 25px;
+    width: 360px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    text-align: center;
+  }
 
-    img {
-      width: 100%;
-      border-radius: 15px;
-      margin-bottom: 15px;
-    }
+  .cover {
+    width: 280px;
+    height: 280px;
+    border-radius: 20px;
+    background: #333;
+    overflow: hidden;
+    margin: 0 auto 15px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.6);
+  }
 
-    h2 {
-      font-size: 16px;
-      margin: 10px 0 15px 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    button {
-      background: #1db954;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      margin: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
+  .song-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
 
-    button:hover {
-      background: #17a34a;
-    }
-  </style>
+  .artist {
+    font-size: 14px;
+    color: #bbb;
+    margin-bottom: 15px;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .controls button:hover {
+    transform: scale(1.2);
+  }
+
+  .progress-container {
+    width: 100%;
+    height: 5px;
+    background: #333;
+    border-radius: 5px;
+    margin: 15px 0;
+    cursor: pointer;
+  }
+
+  .progress {
+    height: 100%;
+    width: 0%;
+    background: #1DB954;
+    border-radius: 5px;
+  }
+
+  .time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #bbb;
+  }
+</style>
 </head>
 <body>
-  <div class="player">
-    <img id="cover" src="https://i.imgur.com/zEfdO3O.jpg" alt="Cover Art">
-    <h2 id="title">Click Start to Play</h2>
-    <audio id="audio" controls></audio>
-    <div>
-      <button id="startBtn" onclick="startRadio()">▶ Start Radio</button>
-      <button onclick="prevSong()">⏮ Prev</button>
-      <button onclick="nextSong()">⏭ Next</button>
-    </div>
+
+<div class="player">
+  <div class="cover">
+    <img id="coverImg" src="https://i.imgur.com/ZqN3s3Q.png" alt="Album Art">
+  </div>
+  <div class="song-title" id="songTitle">Loading...</div>
+  <div class="artist" id="artistName">Gya09 Radio</div>
+
+  <div class="progress-container" onclick="setProgress(event)">
+    <div class="progress" id="progress"></div>
+  </div>
+  <div class="time">
+    <span id="currentTime">0:00</span>
+    <span id="duration">0:00</span>
   </div>
 
-  <script>
-    const songs = [
-      {
-        title: "Miley Cyrus - Angels Like You",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/%40MileyCyrus%20-%20Angels%20Like%20You%20%28Lyrics%29.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      },
-      {
-        title: "Adele - Easy On Me",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/Adele%20-%20Easy%20On%20Me%20%28Official%20Lyric%20Video%29.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      },
-      {
-        title: "Alphaville - Forever Young",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/Alphaville%20-%20Forever%20Young%20%28%20Video%20Lyrics%20%29.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      },
-      {
-        title: "Benson Boone - Beautiful Things",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/Benson%20Boone%20-%20Beautiful%20Things%20%28Official%20Music%20Video%29.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      },
-      {
-        title: "Bruno Mars - When I Was Your Man",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/Bruno%20Mars%20-%20When%20I%20Was%20Your%20Man.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      },
-      {
-        title: "Joji - Glimpse of Us",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/Joji%20-%20Glimpse%20of%20Us%20%28Lyrics%29.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      },
-      {
-        title: "Arctic Monkeys - 505",
-        src: "https://raw.githubusercontent.com/gya09/Radio/main/music/arctic%20monkeys%20__%20505%20lyrics.mp3",
-        cover: "https://i.imgur.com/zEfdO3O.jpg"
-      }
-    ];
+  <div class="controls">
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="togglePlay()">⏯</button>
+    <button onclick="nextSong()">⏭</button>
+  </div>
 
-    let currentIndex = 0;
-    const audio = document.getElementById("audio");
-    const title = document.getElementById("title");
-    const cover = document.getElementById("cover");
-    const startBtn = document.getElementById("startBtn");
+  <audio id="audio"></audio>
+</div>
 
-    function loadSong(index) {
-      const song = songs[index];
-      title.textContent = song.title;
-      cover.src = song.cover;
-      audio.src = song.src;
-    }
+<script>
+const songs = [
+  {title: "Angels Like You", artist: "Miley Cyrus", file: "https://github.com/Gya09/Radio/releases/download/v1.0/MileyCyrus.-.Angels.Like.You.Lyrics.mp3"},
+  {title: "Easy On Me", artist: "Adele", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Adele.-.Easy.On.Me.Official.Lyric.Video.mp3"},
+  {title: "Forever Young", artist: "Alphaville", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Alphaville.-.Forever.Young.Video.Lyrics.mp3"},
+  {title: "505", artist: "Arctic Monkeys", file: "https://github.com/Gya09/Radio/releases/download/v1.0/arctic.monkeys.__.505.lyrics.mp3"},
+  {title: "Beautiful Things", artist: "Benson Boone", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Benson.Boone.-.Beautiful.Things.Official.Music.Video.mp3"},
+  {title: "When I Was Your Man", artist: "Bruno Mars", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Bruno.Mars.-.When.I.Was.Your.Man.mp3"},
+  {title: "Can I Be Him", artist: "James Arthur", file: "https://github.com/Gya09/Radio/releases/download/v1.0/can.i.be.him.-.james.arthur.speed.up.with.lyrics.mp3"},
+  {title: "I Can Tell", artist: "Giveon", file: "https://github.com/Gya09/Radio/releases/download/v1.0/GIVEON.-.I.CAN.TELL.mp3"},
+  {title: "Drunk Text", artist: "Henry Moodie", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Henry.Moodie.-.drunk.text.Lyrics.mp3"},
+  {title: "Glimpse of Us", artist: "Joji", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Joji.-.Glimpse.of.Us.Lyrics.mp3"},
+  {title: "Somewhere Only We Know", artist: "Keane", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Keane.-.Somewhere.Only.We.Know.Lyrics.mp3"},
+  {title: "Die With A Smile", artist: "Lady Gaga & Bruno Mars", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Lady.Gaga.Bruno.Mars.-.Die.With.A.Smile.Lyrics.mp3"},
+  {title: "We Hug Now", artist: "Sydney Rose", file: "https://github.com/Gya09/Radio/releases/download/v1.0/Sydney.Rose.-.We.Hug.Now.Lyrics.mp3"},
+  {title: "Die For You", artist: "The Weeknd", file: "https://github.com/Gya09/Radio/releases/download/v1.0/The.Weeknd.-.DIE.FOR.YOU.Lyrics.mp3"}
+];
 
-    function startRadio() {
-      startBtn.style.display = "none";
-      audio.play().catch(err => {
-        console.log("Playback blocked:", err);
-        alert("Jika tidak otomatis, tekan tombol Play di bawah.");
-      });
-    }
+let index = 0;
+const audio = document.getElementById('audio');
+const title = document.getElementById('songTitle');
+const artist = document.getElementById('artistName');
+const cover = document.getElementById('coverImg');
+const progress = document.getElementById('progress');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+let playing = false;
 
-    function nextSong() {
-      currentIndex = (currentIndex + 1) % songs.length;
-      loadSong(currentIndex);
-      audio.play();
-    }
+function loadSong(i) {
+  const song = songs[i];
+  audio.src = song.file;
+  title.textContent = song.title;
+  artist.textContent = song.artist;
+  cover.src = "https://i.imgur.com/ZqN3s3Q.png"; // gambar default
+  audio.play();
+  playing = true;
+}
 
-    function prevSong() {
-      currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-      loadSong(currentIndex);
-      audio.play();
-    }
+function togglePlay() {
+  if (playing) {
+    audio.pause();
+  } else {
+    audio.play();
+  }
+  playing = !playing;
+}
 
-    audio.addEventListener("ended", nextSong);
-    loadSong(currentIndex);
-  </script>
+function nextSong() {
+  index = (index + 1) % songs.length;
+  loadSong(index);
+}
+
+function prevSong() {
+  index = (index - 1 + songs.length) % songs.length;
+  loadSong(index);
+}
+
+audio.addEventListener('ended', nextSong);
+
+audio.addEventListener('timeupdate', () => {
+  const { currentTime, duration } = audio;
+  const progressPercent = (currentTime / duration) * 100;
+  progress.style.width = `${progressPercent}%`;
+  currentTimeEl.textContent = formatTime(currentTime);
+  durationEl.textContent = formatTime(duration);
+});
+
+function setProgress(e) {
+  const width = e.target.clientWidth;
+  const clickX = e.offsetX;
+  const duration = audio.duration;
+  audio.currentTime = (clickX / width) * duration;
+}
+
+function formatTime(sec) {
+  if (isNaN(sec)) return "0:00";
+  const minutes = Math.floor(sec / 60);
+  const seconds = Math.floor(sec % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+window.onload = () => loadSong(index);
+</script>
+
 </body>
 </html>
